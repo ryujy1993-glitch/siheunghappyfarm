@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시흥시 시민행복텃밭 농작물 캘린더</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f5f0e8; color: #3a2e1e; min-height: 100vh; }
+
+  header {
+    background: linear-gradient(135deg, #4a7c3f, #6aab5e);
+    color: white;
+    padding: 24px 20px 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  header h1 { font-size: 1.8rem; font-weight: 700; }
+  header p { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
+
+  .weather-loading { font-size: 0.85rem; color: #888; padding: 14px; text-align: center; }
+
+  .weather-section {
+    background: #eaf3f8;
+    border-bottom: 1px solid #c8dcea;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .weather-card {
+    background: white;
+    border-radius: 18px;
+    padding: 12px 22px;
+    min-width: 155px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    border: 1px solid #dde8f0;
+  }
+  .weather-card .w-icon { font-size: 2.2rem; line-height: 1; flex-shrink: 0; }
+  .weather-card .w-info { display: flex; flex-direction: column; gap: 3px; }
+  .weather-card .w-day { font-size: 0.84rem; font-weight: 700; color: #3a6aaa; }
+  .weather-card .w-desc { font-size: 0.78rem; color: #666; }
+  .weather-card .w-temp { font-size: 0.88rem; font-weight: 600; color: #333; }
+  .weather-card .w-temp span { font-weight: 400; color: #999; }
+
+  .month-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+  }
+  .month-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 2px solid #c8dfc4;
+    background: white;
+    color: #4a7c3f;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .month-btn:hover { background: #e8f5e2; }
+  .month-btn.active { background: #4a7c3f; color: white; border-color: #4a7c3f; }
+
+  .season-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+  .season-tab {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .season-tab[data-season="봄"] { background: #fef0f5; color: #c25f8a; border-color: #f0b8d0; }
+  .season-tab[data-season="봄"].active { background: #c25f8a; color: white; }
+  .season-tab[data-season="여름"] { background: #edf7ed; color: #3a8c3a; border-color: #a8d8a8; }
+  .season-tab[data-season="여름"].active { background: #3a8c3a; color: white; }
+  .season-tab[data-season="가을"] { background: #fff5e8; color: #c87020; border-color: #f0c080; }
+  .season-tab[data-season="가을"].active { background: #c87020; color: white; }
+  .season-tab[data-season="겨울"] { background: #eef3fa; color: #3a6aaa; border-color: #a8c0e8; }
+  .season-tab[data-season="겨울"].active { background: #3a6aaa; color: white; }
+
+  .current-info {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.95rem;
+    color: #666;
+  }
+  .current-info strong { color: #4a7c3f; font-size: 1.1rem; }
+
+  .filter-bar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 4px 12px;
+    border-radius: 14px;
+    border: 1.5px solid #c8dfc4;
+    background: white;
+    color: #4a7c3f;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn.active { background: #4a7c3f; color: white; border-color: #4a7c3f; }
+
+  .veggie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    padding: 16px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .veggie-card {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border-left: 5px solid #aaa;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .veggie-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+  .veggie-card.highlight { border-left-color: #f5a623; background: #fffbf0; }
+
+  .veggie-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .crop-emoji { font-size: 2rem; }
+  .crop-name { font-size: 1.05rem; font-weight: 700; }
+  .crop-category { font-size: 0.75rem; color: #888; background: #f0f0f0; padding: 2px 8px; border-radius: 10px; }
+
+  .timeline-row { margin: 6px 0; }
+  .timeline-label { font-size: 0.75rem; color: #888; margin-bottom: 3px; }
+  .timeline-bar {
+    display: flex;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f0f0f0;
+  }
+  .timeline-segment { height: 100%; transition: opacity 0.2s; }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.72rem; color: #666; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  .tip-box {
+    background: #fffbf0;
+    border: 1px solid #f0d080;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: #7a5a10;
+  }
+  .extra-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .caution-box {
+    background: #fff5f5;
+    border: 1px solid #f5b8b8;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    color: #a03030;
+  }
+  .hint-box {
+    background: #f0f8ff;
+    border: 1px solid #a8d0f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    color: #1a5a8a;
+  }
+  .sow-box {
+    background: #f5f0ff;
+    border: 1px solid #c8a8f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    color: #5a2a8a;
+  }
+
+  .month-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: #aaa;
+    padding: 0 2px;
+    margin-top: 2px;
+  }
+
+  .no-result {
+    text-align: center;
+    padding: 40px;
+    color: #aaa;
+    font-size: 1rem;
+    grid-column: 1/-1;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.78rem;
+    color: #999;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌾 시흥시 시민행복텃밭 농작물 캘린더</h1>
+  <p>경기도 시흥시 기준 · 파종부터 수확까지 한눈에</p>
+  <p style="margin-top:8px;font-size:0.82rem;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:20px;display:inline-block;padding:5px 16px;opacity:0.92;">📅 시민행복텃밭 운영기간(4월~11월) 기준으로 표시됩니다</p>
+</header>
+
+<div id="weatherBar"><div class="weather-loading">🌤 날씨 불러오는 중...</div></div>
+
+<div class="month-nav" id="monthNav"></div>
+<div class="current-info" id="currentInfo"></div>
+
+<div class="season-tabs" id="seasonTabs">
+  <div class="season-tab" data-season="전체">🌍 전체</div>
+  <div class="season-tab" data-season="봄">🌸 봄</div>
+  <div class="season-tab" data-season="여름">☀️ 여름</div>
+  <div class="season-tab" data-season="가을">🍂 가을</div>
+  <div class="season-tab" data-season="겨울">❄️ 겨울</div>
+</div>
+
+<div class="filter-bar" id="filterBar">
+  <button class="filter-btn active" data-cat="전체">전체</button>
+  <button class="filter-btn" data-cat="채소">🥬 채소</button>
+  <button class="filter-btn" data-cat="과일">🍅 과일·열매</button>
+  <button class="filter-btn" data-cat="곡류">🌾 곡류</button>
+  <button class="filter-btn" data-cat="뿌리">🥕 뿌리채소</button>
+</div>
+
+<div class="veggie-grid" id="veggieGrid"></div>
+
+<footer>📍 경기도 시흥시(중부지방) 기준 · 국립원예특작과학원 텃밭 캘린더 참고 · 기후에 따라 시기가 다소 달라질 수 있습니다</footer>
+
+<script>
+// ── 날씨 (Open-Meteo, 시흥시 좌표) ──────────────────────────────
+const WMO = {
+  0:'맑음', 1:'대체로 맑음', 2:'구름 조금', 3:'흐림',
+  45:'안개', 48:'안개',
+  51:'이슬비', 53:'이슬비', 55:'이슬비',
+  61:'비', 63:'비', 65:'강한 비',
+  71:'눈', 73:'눈', 75:'강한 눈',
+  80:'소나기', 81:'소나기', 82:'강한 소나기',
+  95:'뇌우', 96:'뇌우', 99:'뇌우'
+};
+const WMO_ICON = {
+  0:'☀️', 1:'🌤', 2:'⛅', 3:'☁️',
+  45:'🌫', 48:'🌫',
+  51:'🌦', 53:'🌦', 55:'🌧',
+  61:'🌧', 63:'🌧', 65:'🌧',
+  71:'🌨', 73:'❄️', 75:'❄️',
+  80:'🌦', 81:'🌧', 82:'⛈',
+  95:'⛈', 96:'⛈', 99:'⛈'
+};
+
+async function loadWeather() {
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast' +
+      '?latitude=37.3797&longitude=126.8031' +
+      '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
+      '&timezone=Asia%2FSeoul&forecast_days=2';
+    const res = await fetch(url);
+    const d = await res.json();
+    const days = d.daily;
+    const labels = ['오늘', '내일'];
+    const cards = labels.map((label, i) => {
+      const code = days.weathercode[i];
+      const icon = WMO_ICON[code] || '🌡';
+      const desc = WMO[code] || '알 수 없음';
+      const max = Math.round(days.temperature_2m_max[i]);
+      const min = Math.round(days.temperature_2m_min[i]);
+      const rain = days.precipitation_probability_max[i];
+      const now = new Date();
+      const target = new Date(now);
+      target.setDate(now.getDate() + i);
+      const mo = target.getMonth()+1, da = target.getDate();
+      return `<div class="weather-card">
+        <div class="w-icon">${icon}</div>
+        <div class="w-info">
+          <div class="w-day">${label} (${mo}/${da})</div>
+          <div class="w-desc">${desc} · ${max}° <span>/ ${min}°</span></div>
+          <div class="w-temp">🌂 강수 ${rain}%</div>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('weatherBar').outerHTML =
+      `<div class="weather-section" id="weatherBar">${cards}</div>`;
+  } catch(e) {
+    document.getElementById('weatherBar').innerHTML =
+      '<div class="weather-loading">🌤 날씨 정보를 불러올 수 없습니다</div>';
+  }
+}
+loadWeather();
+// ────────────────────────────────────────────────────────────────
+
+const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const NAV_MONTHS = [4,5,6,7,8,9,10,11];
+
+const DAEJPA_SVG = `<svg width="52" height="52" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<path d="M242,30 Q238,80 236,130 Q234,180 236,230 Q238,260 242,280" stroke="#3a9030" stroke-width="16" fill="none" stroke-linecap="round"/>
+<path d="M252,28 Q248,78 246,128 Q244,178 246,228 Q248,258 252,278" stroke="#52b040" stroke-width="10" fill="none" stroke-linecap="round"/>
+<path d="M236,28 Q240,15 244,5 Q246,15 248,28" fill="#3a9030"/>
+<path d="M234,278 Q230,310 229,340 Q228,370 230,395 Q232,415 238,428" stroke="#f0f0e8" stroke-width="20" fill="none" stroke-linecap="round"/>
+<path d="M250,278 Q254,310 255,340 Q256,370 254,395 Q252,415 246,428" stroke="#e0e0d5" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M238,285 Q237,320 237,355 Q237,385 239,408" stroke="#c8c8b8" stroke-width="0.7" fill="none" opacity="0.6"/>
+<path d="M244,283 Q243,318 243,353 Q243,383 245,406" stroke="#c8c8b8" stroke-width="0.7" fill="none" opacity="0.6"/>
+<ellipse cx="241" cy="432" rx="14" ry="6" fill="#d8d0b8"/>
+<path d="M234,432 Q222,444 216,456" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M237,434 Q227,448 223,462" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M240,435 Q232,450 230,465" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M243,435 Q238,452 237,467" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M246,434 Q244,450 244,465" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M249,433 Q250,448 252,462" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M252,431 Q256,444 260,456" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M332,25 Q328,75 326,125 Q324,175 326,225 Q328,258 332,278" stroke="#2a7020" stroke-width="17" fill="none" stroke-linecap="round"/>
+<path d="M342,23 Q338,73 336,123 Q334,173 336,223 Q338,256 342,276" stroke="#52b040" stroke-width="11" fill="none" stroke-linecap="round"/>
+<path d="M326,23 Q330,10 336,2 Q338,12 340,23" fill="#2a7020"/>
+<path d="M324,276 Q320,308 319,340 Q318,372 320,398 Q322,418 328,432" stroke="#f5f5ee" stroke-width="22" fill="none" stroke-linecap="round"/>
+<path d="M342,276 Q346,308 347,340 Q348,372 346,398 Q344,418 338,432" stroke="#ddddd0" stroke-width="9" fill="none" stroke-linecap="round"/>
+<path d="M328,282 Q327,318 327,352 Q327,382 329,408" stroke="#c8c8b8" stroke-width="0.7" fill="none" opacity="0.6"/>
+<path d="M334,280 Q333,316 333,350 Q333,380 335,406" stroke="#c8c8b8" stroke-width="0.7" fill="none" opacity="0.6"/>
+<ellipse cx="332" cy="436" rx="15" ry="6" fill="#d8d0b8"/>
+<path d="M322,436 Q310,448 304,460" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M325,438 Q315,452 311,466" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M328,439 Q320,454 318,469" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M331,440 Q326,456 325,471" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M334,440 Q332,457 332,472" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M337,439 Q338,455 340,470" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M340,438 Q344,452 348,465" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M343,436 Q350,448 356,460" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M422,30 Q418,80 416,130 Q414,180 416,230 Q418,260 422,280" stroke="#3a9030" stroke-width="16" fill="none" stroke-linecap="round"/>
+<path d="M432,28 Q428,78 426,128 Q424,178 426,228 Q428,258 432,278" stroke="#52b040" stroke-width="10" fill="none" stroke-linecap="round"/>
+<path d="M416,28 Q420,15 424,5 Q426,15 428,28" fill="#3a9030"/>
+<path d="M414,278 Q410,310 409,340 Q408,370 410,395 Q412,415 418,428" stroke="#f0f0e8" stroke-width="20" fill="none" stroke-linecap="round"/>
+<path d="M430,278 Q434,310 435,340 Q436,370 434,395 Q432,415 426,428" stroke="#e0e0d5" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M418,285 Q417,320 417,355 Q417,385 419,408" stroke="#c8c8b8" stroke-width="0.7" fill="none" opacity="0.6"/>
+<path d="M424,283 Q423,318 423,353 Q423,383 425,406" stroke="#c8c8b8" stroke-width="0.7" fill="none" opacity="0.6"/>
+<ellipse cx="421" cy="432" rx="14" ry="6" fill="#d8d0b8"/>
+<path d="M412,432 Q400,444 394,456" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M415,434 Q405,448 401,462" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M418,435 Q410,450 408,465" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M421,435 Q416,452 415,467" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M424,434 Q422,450 422,465" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M427,433 Q430,448 432,462" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M430,431 Q436,444 440,456" stroke="#b8a878" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M238,50 Q237,100 236,150 Q235,200 237,245" stroke="#2a7020" stroke-width="1" fill="none" opacity="0.4"/>
+<path d="M328,45 Q327,95 326,145 Q325,195 327,240" stroke="#2a7020" stroke-width="1" fill="none" opacity="0.4"/>
+<path d="M418,50 Q417,100 416,150 Q415,200 417,245" stroke="#2a7020" stroke-width="1" fill="none" opacity="0.4"/>
+<path d="M228,272 Q230,265 242,263 Q256,261 258,268 Q256,278 242,280 Q228,282 228,272Z" fill="#c8e8a0" opacity="0.7"/>
+<path d="M318,266 Q320,259 332,257 Q346,255 348,262 Q346,272 332,274 Q318,276 318,266Z" fill="#c8e8a0" opacity="0.7"/>
+<path d="M408,272 Q410,265 422,263 Q436,261 438,268 Q436,278 422,280 Q408,282 408,272Z" fill="#c8e8a0" opacity="0.7"/>
+</svg>`;
+
+const BAECHU_SVG = `<svg width="52" height="52" viewBox="0 0 680 700" xmlns="http://www.w3.org/2000/svg">
+<defs><clipPath id="bc"><ellipse cx="340" cy="390" rx="210" ry="280"/></clipPath></defs>
+<path d="M340,60 Q390,50 430,65 Q468,80 488,108 Q510,95 535,108 Q558,125 555,152 Q578,162 590,188 Q596,215 582,235 Q600,255 598,285 Q594,310 578,325 Q590,350 582,375 Q570,398 550,408 Q548,435 530,452 Q508,465 485,462 Q468,482 445,492 Q412,502 380,500 Q362,510 340,512 Q318,510 300,500 Q268,502 245,492 Q222,482 205,462 Q182,465 160,452 Q140,435 138,408 Q118,398 106,375 Q98,350 110,325 Q94,310 90,285 Q88,255 106,235 Q92,215 98,188 Q110,162 133,152 Q130,125 153,108 Q178,95 200,108 Q220,80 258,65 Q290,50 340,60Z" fill="#5cb832"/>
+<path d="M340,75 Q385,65 420,80 Q454,95 470,122 Q490,110 512,124 Q532,140 528,165 Q550,178 560,202 Q564,228 550,246 Q566,268 562,295 Q556,318 542,330 Q552,355 542,378 Q530,398 512,406 Q508,430 492,445 Q472,456 452,452 Q436,470 415,478 Q385,486 358,484 Q348,490 340,491 Q332,490 322,484 Q295,486 265,478 Q244,470 228,452 Q208,456 188,445 Q170,430 166,406 Q148,398 136,378 Q126,355 136,330 Q122,318 116,295 Q112,268 128,246 Q114,228 118,202 Q128,178 150,165 Q146,140 166,124 Q188,110 208,122 Q224,95 258,80 Q295,65 340,75Z" fill="#72c840"/>
+<path d="M340,95 Q378,87 408,102 Q436,118 450,144 Q468,134 486,148 Q502,164 498,186 Q518,200 524,222 Q526,246 514,262 Q526,282 522,306 Q516,326 504,336 Q512,358 504,378 Q492,396 476,402 Q470,424 456,437 Q438,446 420,442 Q406,458 388,464 Q366,470 344,468 Q342,470 340,471 Q338,470 336,468 Q314,470 292,464 Q274,458 260,442 Q242,446 224,437 Q210,424 204,402 Q188,396 176,378 Q168,358 176,336 Q164,326 158,306 Q154,282 166,262 Q154,246 156,222 Q162,200 182,186 Q178,164 194,148 Q212,134 230,144 Q244,118 272,102 Q302,87 340,95Z" fill="#90d848"/>
+<path d="M340,108 Q362,104 376,118 Q388,134 386,158 Q400,152 412,162 Q422,174 418,192 Q432,198 438,216 Q438,236 428,248 Q438,264 434,284 Q428,300 418,308 Q424,328 418,346 Q408,362 396,366 Q392,386 382,398 Q368,408 354,406 Q348,416 340,418 Q332,416 326,406 Q312,408 298,398 Q286,386 282,366 Q270,362 260,346 Q254,328 260,308 Q250,300 244,284 Q240,264 250,248 Q240,236 240,216 Q246,198 260,192 Q256,174 266,162 Q278,152 292,158 Q290,134 302,118 Q316,104 340,108Z" fill="#e8f8d0"/>
+<path d="M340,125 Q356,122 366,134 Q374,148 372,168 Q384,164 392,174 Q398,186 394,202 Q406,210 410,226 Q410,244 400,254 Q408,270 404,288 Q398,302 390,308 Q394,328 388,344 Q380,356 370,360 Q364,376 356,386 Q348,392 340,393 Q332,392 324,386 Q316,376 310,360 Q300,356 292,344 Q286,328 290,308 Q282,302 276,288 Q272,270 280,254 Q270,244 270,226 Q274,210 286,202 Q282,186 288,174 Q296,164 308,168 Q306,148 314,134 Q324,122 340,125Z" fill="#f5fcea"/>
+<path d="M308,168 Q282,178 260,192 Q244,206 238,226" stroke="#b8e080" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M284,238 Q260,248 244,262 Q232,278 230,298" stroke="#b8e080" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M276,306 Q255,318 246,336 Q240,352 242,368" stroke="#b8e080" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M372,168 Q398,178 420,192 Q436,206 442,226" stroke="#b8e080" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M396,238 Q420,248 436,262 Q448,278 450,298" stroke="#b8e080" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M404,306 Q425,318 434,336 Q440,352 438,368" stroke="#b8e080" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M175,175 Q190,168 205,175 Q220,182 235,175 Q250,168 262,173" stroke="#4aaa28" stroke-width="1.5" fill="none" opacity="0.6"/>
+<path d="M160,230 Q177,222 195,230 Q213,238 230,230 Q247,222 262,228" stroke="#4aaa28" stroke-width="1.5" fill="none" opacity="0.55"/>
+<path d="M148,285 Q167,277 186,285 Q205,293 223,285 Q241,277 258,283" stroke="#4aaa28" stroke-width="1.4" fill="none" opacity="0.5"/>
+<path d="M145,340 Q164,332 184,340 Q204,348 222,340 Q240,332 257,338" stroke="#4aaa28" stroke-width="1.4" fill="none" opacity="0.5"/>
+<path d="M150,395 Q169,387 188,395 Q207,403 224,395 Q241,387 256,393" stroke="#4aaa28" stroke-width="1.3" fill="none" opacity="0.45"/>
+<path d="M505,175 Q490,168 475,175 Q460,182 445,175 Q430,168 418,173" stroke="#4aaa28" stroke-width="1.5" fill="none" opacity="0.6"/>
+<path d="M520,230 Q503,222 485,230 Q467,238 450,230 Q433,222 418,228" stroke="#4aaa28" stroke-width="1.5" fill="none" opacity="0.55"/>
+<path d="M532,285 Q513,277 494,285 Q475,293 457,285 Q439,277 422,283" stroke="#4aaa28" stroke-width="1.4" fill="none" opacity="0.5"/>
+<path d="M535,340 Q516,332 496,340 Q476,348 458,340 Q440,332 423,338" stroke="#4aaa28" stroke-width="1.4" fill="none" opacity="0.5"/>
+<path d="M530,395 Q511,387 492,395 Q473,403 456,395 Q439,387 424,393" stroke="#4aaa28" stroke-width="1.3" fill="none" opacity="0.45"/>
+<ellipse cx="340" cy="500" rx="80" ry="20" fill="#ddf0b8"/>
+<ellipse cx="340" cy="500" rx="60" ry="14" fill="#eef8d0"/>
+</svg>`;
+
+const CABBAGE_SVG = `<svg width="52" height="52" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg">
+<path d="M196,318 Q168,330 148,348 Q132,364 128,382 Q126,396 136,402 Q146,406 158,398 Q172,386 188,370 Q204,354 216,340" stroke="#2a3a18" stroke-width="10" fill="none" stroke-linecap="round"/>
+<path d="M484,318 Q512,330 532,348 Q548,364 552,382 Q554,396 544,402 Q534,406 522,398 Q508,386 492,370 Q476,354 464,340" stroke="#2a3a18" stroke-width="10" fill="none" stroke-linecap="round"/>
+<path d="M132,396 Q120,390 114,382" stroke="#2a3a18" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M130,404 Q118,402 112,398" stroke="#2a3a18" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M134,412 Q122,412 116,410" stroke="#2a3a18" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M548,396 Q560,390 566,382" stroke="#2a3a18" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M550,404 Q562,402 568,398" stroke="#2a3a18" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M546,412 Q558,412 564,410" stroke="#2a3a18" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M298,500 Q290,522 284,544 Q280,558 282,568" stroke="#2a3a18" stroke-width="11" fill="none" stroke-linecap="round"/>
+<path d="M382,500 Q390,522 396,544 Q400,558 398,568" stroke="#2a3a18" stroke-width="11" fill="none" stroke-linecap="round"/>
+<ellipse cx="280" cy="570" rx="20" ry="9" fill="#2a3a18"/>
+<ellipse cx="400" cy="570" rx="20" ry="9" fill="#2a3a18"/>
+<path d="M340,72 Q382,64 416,76 Q446,88 464,112 Q486,98 508,112 Q526,128 522,152 Q544,164 554,188 Q556,212 542,228 Q558,248 556,276 Q550,298 536,310 Q546,334 538,356 Q524,376 506,382 Q500,406 482,420 Q462,432 440,428 Q424,448 402,456 Q374,464 340,462 Q306,464 278,456 Q256,448 240,428 Q218,432 198,420 Q180,406 174,382 Q156,376 142,356 Q134,334 144,310 Q130,298 124,276 Q122,248 138,228 Q124,212 126,188 Q136,164 158,152 Q154,128 172,112 Q194,98 216,112 Q234,88 264,76 Q298,64 340,72Z" fill="#8cc832"/>
+<path d="M340,88 Q376,80 406,94 Q432,108 446,132 Q466,120 484,134 Q498,150 494,172 Q514,184 520,208 Q520,232 506,246 Q520,266 516,292 Q508,312 496,322 Q504,346 494,366 Q480,384 462,388 Q454,410 436,422 Q416,430 394,428 Q368,442 340,444 Q312,442 286,428 Q264,430 244,422 Q226,410 218,388 Q200,384 186,366 Q176,346 186,322 Q174,312 166,292 Q162,266 176,246 Q162,232 162,208 Q168,184 188,172 Q184,150 198,134 Q216,120 236,132 Q250,108 276,94 Q304,80 340,88Z" fill="#a4d840"/>
+<ellipse cx="340" cy="278" rx="158" ry="172" fill="#bcec54"/>
+<ellipse cx="340" cy="278" rx="138" ry="152" fill="#ccf464"/>
+<ellipse cx="340" cy="278" rx="116" ry="130" fill="#d8f870"/>
+<ellipse cx="294" cy="192" rx="44" ry="30" fill="#eaff9a" opacity="0.5" transform="rotate(-18,294,192)"/>
+<path d="M206,208 Q254,194 298,190 Q340,188 382,190 Q426,194 474,210" stroke="#82b828" stroke-width="1.3" fill="none" opacity="0.5"/>
+<path d="M196,256 Q248,240 298,236 Q340,234 382,236 Q432,240 484,258" stroke="#82b828" stroke-width="1.2" fill="none" opacity="0.45"/>
+<path d="M196,306 Q248,290 298,286 Q340,284 382,286 Q432,290 484,308" stroke="#82b828" stroke-width="1.2" fill="none" opacity="0.4"/>
+<path d="M288,256 Q298,248 310,252" stroke="#2a3a18" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path d="M370,256 Q382,248 392,252" stroke="#2a3a18" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<ellipse cx="300" cy="276" rx="13" ry="15" fill="#2a3a18"/>
+<ellipse cx="296" cy="271" rx="4.5" ry="4.5" fill="#fff" opacity="0.65"/>
+<ellipse cx="380" cy="276" rx="13" ry="15" fill="#2a3a18"/>
+<ellipse cx="376" cy="271" rx="4.5" ry="4.5" fill="#fff" opacity="0.65"/>
+<ellipse cx="272" cy="308" rx="24" ry="13" fill="#f4a8a0" opacity="0.4"/>
+<ellipse cx="408" cy="308" rx="24" ry="13" fill="#f4a8a0" opacity="0.4"/>
+<path d="M306,330 Q324,352 340,356 Q356,352 374,330" stroke="#2a3a18" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M306,330 Q302,323 307,318" stroke="#2a3a18" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path d="M374,330 Q378,323 373,318" stroke="#2a3a18" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path d="M326,80 Q320,56 312,40 Q324,52 336,44 Q340,56 340,74" fill="#4e8e1a"/>
+<path d="M354,80 Q360,56 368,40 Q356,52 344,46 Q340,58 340,74" fill="#4e8e1a"/>
+<path d="M340,82 Q334,60 332,44 Q340,54 348,44 Q346,60 340,82" fill="#66aa28"/>
+</svg>`;
+
+const SPINACH_SVG = `<svg width="52" height="52" viewBox="0 0 680 640" xmlns="http://www.w3.org/2000/svg">
+<path d="M340,580 Q334,540 330,500 Q326,465 328,435" stroke="#c8703a" stroke-width="14" fill="none" stroke-linecap="round"/>
+<path d="M340,580 Q346,540 350,500 Q354,465 352,435" stroke="#d4845a" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M328,455 Q295,448 268,432 Q242,414 228,392 Q216,370 220,348 Q226,330 242,322 Q258,316 276,324 Q292,332 304,348 Q316,365 322,388 Q326,410 328,432 Z" fill="#3a8e28"/>
+<path d="M328,455 Q310,438 296,418 Q282,398 278,376 Q274,355 284,340 Q294,328 308,334 Q320,340 326,358 Q332,378 330,405 Q329,430 328,455Z" fill="#4aaa34"/>
+<path d="M242,322 Q268,350 290,378 Q308,402 320,428" stroke="#2a6e1a" stroke-width="1.5" fill="none" opacity="0.7"/>
+<path d="M265,330 Q278,355 288,380 Q296,402 304,424" stroke="#2a6e1a" stroke-width="1" fill="none" opacity="0.5"/>
+<path d="M352,455 Q385,448 412,432 Q438,414 452,392 Q464,370 460,348 Q454,330 438,322 Q422,316 404,324 Q388,332 376,348 Q364,365 358,388 Q354,410 352,432 Z" fill="#3a8e28"/>
+<path d="M352,455 Q370,438 384,418 Q398,398 402,376 Q406,355 396,340 Q386,328 372,334 Q360,340 354,358 Q348,378 350,405 Q351,430 352,455Z" fill="#4aaa34"/>
+<path d="M438,322 Q412,350 390,378 Q372,402 360,428" stroke="#2a6e1a" stroke-width="1.5" fill="none" opacity="0.7"/>
+<path d="M330,420 Q298,405 272,382 Q248,358 240,330 Q234,306 244,286 Q256,268 276,266 Q296,264 312,280 Q326,296 330,320 Q334,345 332,382 Z" fill="#2e7e1e"/>
+<path d="M330,420 Q308,400 296,374 Q284,348 286,322 Q288,300 302,290 Q316,282 326,296 Q336,312 334,340 Q333,372 330,420Z" fill="#3e9a2c"/>
+<path d="M276,266 Q296,300 308,335 Q318,366 326,398" stroke="#1e5e10" stroke-width="1.5" fill="none" opacity="0.65"/>
+<path d="M258,278 Q278,310 292,344 Q304,374 312,404" stroke="#1e5e10" stroke-width="1" fill="none" opacity="0.45"/>
+<path d="M350,420 Q382,405 408,382 Q432,358 440,330 Q446,306 436,286 Q424,268 404,266 Q384,264 368,280 Q354,296 350,320 Q346,345 348,382 Z" fill="#2e7e1e"/>
+<path d="M350,420 Q372,400 384,374 Q396,348 394,322 Q392,300 378,290 Q364,282 354,296 Q344,312 346,340 Q347,372 350,420Z" fill="#3e9a2c"/>
+<path d="M404,266 Q384,300 372,335 Q362,366 354,398" stroke="#1e5e10" stroke-width="1.5" fill="none" opacity="0.65"/>
+<path d="M340,395 Q310,375 290,345 Q272,316 272,286 Q272,258 288,240 Q306,224 328,228 Q338,230 340,238 Q342,230 352,228 Q374,224 392,240 Q408,258 408,286 Q408,316 390,345 Q370,375 340,395Z" fill="#2a7218"/>
+<path d="M340,395 Q316,370 302,340 Q290,312 294,284 Q298,262 314,250 Q328,240 340,244 Q352,240 366,250 Q382,262 386,284 Q390,312 378,340 Q364,370 340,395Z" fill="#3c9028"/>
+<path d="M340,395 Q322,365 316,334 Q312,308 320,286 Q328,268 340,262 Q352,268 360,286 Q368,308 364,334 Q358,365 340,395Z" fill="#4aaa34"/>
+<path d="M340,238 Q340,290 340,342 Q340,368 340,390" stroke="#1a5210" stroke-width="2" fill="none" opacity="0.6"/>
+<path d="M314,250 Q322,295 328,340 Q332,368 336,390" stroke="#1a5210" stroke-width="1.2" fill="none" opacity="0.45"/>
+<path d="M366,250 Q358,295 352,340 Q348,368 344,390" stroke="#1a5210" stroke-width="1.2" fill="none" opacity="0.45"/>
+</svg>`;
+
+const GAT_SVG = `<svg width="52" height="52" viewBox="0 0 680 600" xmlns="http://www.w3.org/2000/svg">
+<path d="M295,580 Q292,530 290,480 Q288,440 290,405" stroke="#c8d870" stroke-width="12" fill="none" stroke-linecap="round"/>
+<path d="M295,580 Q298,530 300,480 Q302,445 300,408" stroke="#dae890" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M340,575 Q338,525 337,475 Q336,435 338,400" stroke="#ccd870" stroke-width="13" fill="none" stroke-linecap="round"/>
+<path d="M340,575 Q343,525 344,475 Q345,438 343,402" stroke="#dcea88" stroke-width="7" fill="none" stroke-linecap="round"/>
+<path d="M384,580 Q382,530 381,480 Q380,440 382,405" stroke="#c8d870" stroke-width="12" fill="none" stroke-linecap="round"/>
+<path d="M384,580 Q387,530 388,480 Q389,444 387,407" stroke="#dae890" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M290,408 Q255,390 228,365 Q204,340 200,310 Q196,282 212,264 Q228,248 250,252 Q268,256 280,272 Q290,290 292,315 Q294,345 292,378 Z" fill="#2a7020"/>
+<path d="M290,408 Q272,385 266,358 Q260,332 268,310 Q276,292 292,288 Q292,318 292,348 Q292,378 290,408Z" fill="#3a8a2c"/>
+<path d="M382,408 Q417,390 444,365 Q468,340 472,310 Q476,282 460,264 Q444,248 422,252 Q404,256 392,272 Q382,290 380,315 Q378,345 380,378 Z" fill="#2a7020"/>
+<path d="M382,408 Q400,385 406,358 Q412,332 404,310 Q396,292 380,288 Q380,318 380,348 Q380,378 382,408Z" fill="#3a8a2c"/>
+<path d="M294,390 Q255,368 226,338 Q200,308 196,276 Q192,248 210,230 Q230,214 254,220 Q274,226 286,248 Q296,270 296,300 Q296,342 294,375 Z" fill="#328a22"/>
+<path d="M294,390 Q272,362 264,330 Q256,300 266,276 Q276,258 294,256 Q294,296 294,336 Q294,366 294,390Z" fill="#44a030"/>
+<path d="M210,230 Q240,262 258,298 Q272,328 280,362" stroke="#1e6010" stroke-width="1.5" fill="none" opacity="0.65"/>
+<path d="M386,390 Q425,368 454,338 Q480,308 484,276 Q488,248 470,230 Q450,214 426,220 Q406,226 394,248 Q384,270 384,300 Q384,342 386,375 Z" fill="#328a22"/>
+<path d="M386,390 Q408,362 416,330 Q424,300 414,276 Q404,258 386,256 Q386,296 386,336 Q386,366 386,390Z" fill="#44a030"/>
+<path d="M470,230 Q440,262 422,298 Q408,328 400,362" stroke="#1e6010" stroke-width="1.5" fill="none" opacity="0.65"/>
+<path d="M300,375 Q255,348 224,312 Q196,278 194,244 Q192,214 212,196 Q234,180 260,188 Q282,196 294,220 Q304,246 302,278 Q300,318 300,355 Z" fill="#3a9228"/>
+<path d="M300,375 Q276,342 268,306 Q260,272 272,246 Q284,224 302,222 Q300,268 300,314 Q300,348 300,375Z" fill="#50aa38"/>
+<path d="M212,196 Q246,232 264,274 Q278,310 286,350" stroke="#236814" stroke-width="1.8" fill="none" opacity="0.65"/>
+<path d="M380,375 Q425,348 456,312 Q484,278 486,244 Q488,214 468,196 Q446,180 420,188 Q398,196 386,220 Q376,246 378,278 Q380,318 380,355 Z" fill="#3a9228"/>
+<path d="M380,375 Q404,342 412,306 Q420,272 408,246 Q396,224 378,222 Q380,268 380,314 Q380,348 380,375Z" fill="#50aa38"/>
+<path d="M468,196 Q434,232 416,274 Q402,310 394,350" stroke="#236814" stroke-width="1.8" fill="none" opacity="0.65"/>
+<path d="M340,360 Q302,334 280,298 Q260,264 262,230 Q264,200 284,184 Q306,170 330,178 Q338,180 340,186 Q342,180 350,178 Q374,170 396,184 Q416,200 418,230 Q420,264 400,298 Q378,334 340,360Z" fill="#44a030"/>
+<path d="M340,360 Q310,328 298,292 Q288,258 298,228 Q308,204 328,196 Q338,192 340,196 Q342,192 352,196 Q372,204 382,228 Q392,258 382,292 Q370,328 340,360Z" fill="#58bc42"/>
+<path d="M340,360 Q320,326 316,290 Q312,258 326,232 Q334,214 340,208 Q346,214 354,232 Q368,258 364,290 Q360,326 340,360Z" fill="#6acc50"/>
+<path d="M340,186 Q340,240 340,295 Q340,328 340,355" stroke="#2a7018" stroke-width="2.2" fill="none" opacity="0.6"/>
+<path d="M312,192 Q320,240 326,290 Q330,322 334,352" stroke="#2a7018" stroke-width="1.3" fill="none" opacity="0.48"/>
+<path d="M368,192 Q360,240 354,290 Q350,322 346,352" stroke="#2a7018" stroke-width="1.3" fill="none" opacity="0.48"/>
+</svg>`;
+
+const CHERRY_TOMATO_SVG = `<svg width="52" height="52" viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg">
+<path d="M340,80 Q338,120 336,160 Q334,200 332,235" stroke="#5a8a28" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M334,185 Q305,195 282,210 Q262,224 252,242" stroke="#5a8a28" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M333,205 Q362,212 386,224 Q406,236 418,252" stroke="#5a8a28" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M332,235 Q334,255 336,272" stroke="#5a8a28" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M310,198 Q298,194 290,190" stroke="#6a9a30" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M358,215 Q370,210 378,206" stroke="#6a9a30" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M252,242 Q242,232 238,228 Q248,235 255,238" fill="#4a8020"/>
+<path d="M252,242 Q240,238 236,236 Q246,240 253,242" fill="#5a9028"/>
+<path d="M252,242 Q244,250 242,255 Q248,248 252,244" fill="#4a8020"/>
+<path d="M252,242 Q260,235 264,230 Q258,238 253,242" fill="#5a9028"/>
+<circle cx="256" cy="330" r="82" fill="#c02010" opacity="0.2"/>
+<circle cx="252" cy="322" r="82" fill="#e03020"/>
+<ellipse cx="222" cy="290" rx="36" ry="28" fill="#f05040" opacity="0.65" transform="rotate(-20,222,290)"/>
+<ellipse cx="210" cy="278" rx="16" ry="12" fill="#ff8070" opacity="0.55" transform="rotate(-20,210,278)"/>
+<ellipse cx="295" cy="360" rx="30" ry="22" fill="#b01808" opacity="0.3" transform="rotate(15,295,360)"/>
+<path d="M252,242 Q252,268 252,282" stroke="#4a7818" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M240,242 Q244,236 252,240 Q260,236 264,242 Q258,246 252,244 Q246,246 240,242Z" fill="#5a9028"/>
+<path d="M418,252 Q408,242 404,238 Q414,245 421,248" fill="#4a8020"/>
+<path d="M418,252 Q406,248 402,246 Q412,250 419,252" fill="#5a9028"/>
+<path d="M418,252 Q410,260 408,265 Q414,258 418,254" fill="#4a8020"/>
+<path d="M418,252 Q426,245 430,240 Q424,248 419,252" fill="#5a9028"/>
+<circle cx="422" cy="332" r="82" fill="#c02010" opacity="0.2"/>
+<circle cx="418" cy="324" r="82" fill="#e03020"/>
+<ellipse cx="388" cy="292" rx="36" ry="28" fill="#f05040" opacity="0.65" transform="rotate(-20,388,292)"/>
+<ellipse cx="376" cy="280" rx="16" ry="12" fill="#ff8070" opacity="0.55" transform="rotate(-20,376,280)"/>
+<ellipse cx="461" cy="362" rx="30" ry="22" fill="#b01808" opacity="0.3" transform="rotate(15,461,362)"/>
+<path d="M418,252 Q418,272 418,286" stroke="#4a7818" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M406,252 Q410,246 418,250 Q426,246 430,252 Q424,256 418,254 Q412,256 406,252Z" fill="#5a9028"/>
+<path d="M336,272 Q326,262 322,258 Q332,265 337,268" fill="#4a8020"/>
+<path d="M336,272 Q324,268 320,266 Q330,270 337,272" fill="#5a9028"/>
+<path d="M336,272 Q328,280 326,285 Q332,278 336,274" fill="#4a8020"/>
+<path d="M336,272 Q344,265 348,260 Q342,268 337,272" fill="#5a9028"/>
+<circle cx="340" cy="378" r="88" fill="#c82818" opacity="0.2"/>
+<circle cx="336" cy="368" r="88" fill="#e83828"/>
+<ellipse cx="302" cy="332" rx="38" ry="30" fill="#f86050" opacity="0.65" transform="rotate(-20,302,332)"/>
+<ellipse cx="288" cy="318" rx="17" ry="13" fill="#ff9080" opacity="0.55" transform="rotate(-20,288,318)"/>
+<ellipse cx="384" cy="412" rx="32" ry="24" fill="#b82010" opacity="0.3" transform="rotate(15,384,412)"/>
+<path d="M336,272 Q336,295 336,310" stroke="#4a7818" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M324,272 Q328,266 336,270 Q344,266 348,272 Q342,276 336,274 Q330,276 324,272Z" fill="#5a9028"/>
+<path d="M330,80 Q322,60 316,45 Q326,58 332,72" fill="#4a8020"/>
+<path d="M340,78 Q338,56 338,40 Q340,58 340,74" fill="#5a9830"/>
+<path d="M350,80 Q358,60 364,45 Q354,58 348,72" fill="#4a8020"/>
+</svg>`;
+
+const DAIKON_SVG = `<svg width="52" height="52" viewBox="0 0 680 660" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="dBG" cx="38%" cy="35%" r="62%"><stop offset="0%" stop-color="#f8faf0"/><stop offset="40%" stop-color="#eef3db"/><stop offset="100%" stop-color="#d0d8a8"/></radialGradient>
+  <radialGradient id="dTG" cx="40%" cy="40%" r="60%"><stop offset="0%" stop-color="#96d460"/><stop offset="55%" stop-color="#72b840"/><stop offset="100%" stop-color="#4e8e28"/></radialGradient>
+  <clipPath id="dBC"><ellipse cx="340" cy="400" rx="130" ry="185"/></clipPath>
+</defs>
+<path d="M290,178 Q240,130 195,108 Q220,118 248,148 Q268,168 282,188" fill="#2e6e1e"/>
+<path d="M395,178 Q445,130 488,108 Q463,118 435,148 Q415,168 402,188" fill="#2e6e1e"/>
+<path d="M275,155 Q235,112 205,92 Q228,105 254,132 Q268,148 276,165" fill="#3a8228"/>
+<path d="M408,155 Q448,112 478,92 Q455,105 429,132 Q415,148 408,165" fill="#3a8228"/>
+<path d="M320,240 Q308,210 298,180 Q288,155 278,125" stroke="#5ab030" stroke-width="10" fill="none" stroke-linecap="round"/>
+<path d="M340,238 Q338,205 335,172 Q332,148 330,118" stroke="#68c038" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M360,240 Q372,210 382,180 Q392,155 402,125" stroke="#5ab030" stroke-width="10" fill="none" stroke-linecap="round"/>
+<path d="M298,178 Q258,138 228,115 Q252,128 274,155 Q288,170 296,185" fill="#4aaa34"/>
+<path d="M285,152 Q252,116 226,98 Q248,112 268,138 Q280,153 287,166" fill="#5cc040"/>
+<path d="M402,178 Q442,138 472,115 Q448,128 426,155 Q412,170 404,185" fill="#4aaa34"/>
+<path d="M415,152 Q448,116 474,98 Q452,112 432,138 Q420,153 413,166" fill="#5cc040"/>
+<path d="M330,120 Q318,84 310,60 Q324,80 332,102 Q335,112 332,122" fill="#5cc040"/>
+<path d="M340,116 Q340,78 342,54 Q343,78 342,100 Q341,110 340,118" fill="#4aaa34"/>
+<path d="M350,120 Q362,84 370,60 Q356,80 348,102 Q345,112 348,122" fill="#5cc040"/>
+<ellipse cx="344" cy="402" rx="134" ry="188" fill="#b8c890" opacity="0.35"/>
+<ellipse cx="340" cy="400" rx="130" ry="185" fill="url(#dBG)"/>
+<rect x="210" y="230" width="260" height="145" fill="url(#dTG)" clip-path="url(#dBC)" opacity="0.88"/>
+<ellipse cx="298" cy="370" rx="38" ry="90" fill="#ffffff" opacity="0.22"/>
+<ellipse cx="308" cy="455" rx="22" ry="12" fill="#8b5e30" opacity="0.32" transform="rotate(-20,308,455)"/>
+<ellipse cx="365" cy="490" rx="18" ry="9" fill="#7a5028" opacity="0.28" transform="rotate(14,365,490)"/>
+<ellipse cx="322" cy="498" rx="14" ry="7" fill="#6e4822" opacity="0.25"/>
+<ellipse cx="355" cy="448" rx="10" ry="5" fill="#8b5e30" opacity="0.22" transform="rotate(-8,355,448)"/>
+<ellipse cx="290" cy="478" rx="8" ry="4" fill="#7a5028" opacity="0.2" transform="rotate(5,290,478)"/>
+<ellipse cx="340" cy="400" rx="130" ry="185" fill="none" stroke="#a0b070" stroke-width="1.2" opacity="0.4"/>
+<path d="M336,582 Q333,604 330,624 Q327,644 325,662" stroke="#c0a060" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+<path d="M344,582 Q347,604 350,624 Q353,644 355,660" stroke="#b89858" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M330,622 Q315,636 305,654 Q297,668 294,682" stroke="#b09050" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M328,638 Q316,652 310,668 Q305,680 304,690" stroke="#a08848" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M350,622 Q365,636 375,654 Q383,668 386,682" stroke="#b09050" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M352,638 Q364,652 370,668 Q375,680 376,690" stroke="#a08848" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M340,655 Q336,668 334,680 Q332,690 332,698" stroke="#988040" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<path d="M215,420 Q200,428 192,438" stroke="#c0a868" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+<path d="M214,442 Q198,452 190,463" stroke="#b89e60" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+<path d="M218,465 Q202,476 196,488" stroke="#c0a868" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+<path d="M226,488 Q212,500 207,512" stroke="#b89e60" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+<path d="M254,526 Q242,538 239,550" stroke="#b89e60" stroke-width="1" fill="none" stroke-linecap="round"/>
+<path d="M295,556 Q285,568 284,580" stroke="#b89e60" stroke-width="1" fill="none" stroke-linecap="round"/>
+<path d="M465,420 Q480,428 488,438" stroke="#c0a868" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+<path d="M466,442 Q482,452 490,463" stroke="#b89e60" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+<path d="M462,465 Q478,476 484,488" stroke="#c0a868" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+<path d="M454,488 Q468,500 473,512" stroke="#b89e60" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+<path d="M426,526 Q438,538 441,550" stroke="#b89e60" stroke-width="1" fill="none" stroke-linecap="round"/>
+<path d="M385,556 Q395,568 396,580" stroke="#b89e60" stroke-width="1" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+// ── 작물 데이터: 국립원예특작과학원 텃밭 캘린더 기준 (중부지방 실외 노지) ──
+// sow: 파종/아주심기, grow: 재배, harvest: 수확
+const crops = [
+  // ── 채소 ──────────────────────────────────────────────
+  { name:'상추', emoji:'🥬', cat:'채소', season:['봄','가을'],
+    sow:[4,9], grow:[4,5,9,10], harvest:[5,6,10,11],
+    tip:'4월 상·중순 아주심기 후 5~6월 수확. 가을은 9월 심어 10~11월 수확. 서늘한 날씨를 좋아해요.',
+    caution:'여름 고온기엔 꽃대(추대)가 올라와 쓴맛이 강해져요. 장마철 과습에 주의하세요.',
+    hint:'잎을 아래부터 조금씩 따주면 오래 수확할 수 있어요. 반그늘에서도 잘 자라요.',
+    sowMethod:'모종 또는 직파. 씨앗은 5~10mm 깊이 줄뿌림, 모종은 15×15cm 간격으로 심어요.' },
+  { name:'시금치', emoji:'🌿', svgIcon:'SPINACH', cat:'채소', season:['봄','가을'],
+    sow:[4,9,10], grow:[4,5,9,10,11], harvest:[5,6,10,11],
+    tip:'봄 파종은 4월, 가을 파종은 9~10월. 추위에 강해 서리를 맞으면 단맛이 늘어요.',
+    caution:'산성 토양에 약해요. 석회를 뿌려 pH 6.5~7.0으로 맞춰주세요.',
+    hint:'씨앗 껍질이 두꺼우니 파종 전날 물에 불려두면 발아율이 높아져요.',
+    sowMethod:'직파(씨앗). 1cm 깊이 줄뿌림 후 흙을 얇게 덮고 충분히 물 주세요.' },
+  { name:'쑥갓', emoji:'🌿', cat:'채소', season:['봄','가을'],
+    sow:[4,9], grow:[4,5,9,10], harvest:[5,6,10,11],
+    tip:'봄·가을 두 번 재배 가능. 꽃대가 올라오기 전에 수확하는 것이 중요해요.',
+    caution:'꽃대가 올라오면 잎이 질겨지고 향이 강해져요. 꽃봉오리 전에 수확하세요.',
+    hint:'15~20cm 자라면 윗부분만 잘라도 다시 자라 계속 수확 가능해요.',
+    sowMethod:'직파(씨앗). 줄뿌림 후 흙을 얇게 덮어요. 10~15cm 간격으로 솎아가며 키워요.' },
+  { name:'고추', emoji:'🌶️', cat:'채소', season:['여름'],
+    sow:[5], grow:[5,6,7,8,9], harvest:[7,8,9,10],
+    tip:'5월 중순 이후 모종 아주심기. 햇빛이 잘 드는 곳에 심어야 잘 자라요.',
+    caution:'저온(10℃ 이하)에 매우 약해요. 5월 중순 이후 서리 걱정 없을 때 심으세요.',
+    hint:'진딧물이 잘 생겨요. 초기에 발견하면 물로 씻어내거나 천연 방제제를 사용하세요.',
+    sowMethod:'모종 구입 후 아주심기. 포기 간격 40~50cm, 두둑 높이 15cm 이상.' },
+  { name:'가지', emoji:'🍆', cat:'채소', season:['여름'],
+    sow:[5], grow:[5,6,7,8,9], harvest:[7,8,9,10],
+    tip:'5월 중순 모종 아주심기. 고온·건조에 강하며 지주대를 세워 주세요.',
+    caution:'건조하면 벌레(응애)가 잘 생겨요. 물을 충분히 주고 통풍을 확보하세요.',
+    hint:'수확은 과실이 윤기 날 때가 최적. 너무 키우면 씨가 많아지고 맛이 떨어져요.',
+    sowMethod:'모종 구입 후 아주심기. 포기 간격 50~60cm. 깊게 심지 않도록 주의.' },
+  { name:'배추', emoji:'🥬', svgIcon:'BAECHU', cat:'채소', season:['가을'],
+    sow:[9], grow:[9,10], harvest:[11],
+    tip:'9월 초순 모종 아주심기. 김장용은 11월 중·하순 수확이 목표예요.',
+    caution:'9월 초 아주심기 타이밍을 놓치면 결구(속차기)가 안 될 수 있어요.',
+    hint:'모종 심기 3~4주 후 포기 사이에 웃거름(질소비료)을 주면 잘 자라요.',
+    sowMethod:'모종 구입 후 아주심기. 포기 간격 40cm, 이랑 너비 60cm 기준.' },
+  { name:'양배추', emoji:'🥬', svgIcon:'CABBAGE', cat:'채소', season:['봄','가을'],
+    sow:[4,8], grow:[4,5,8,9,10], harvest:[6,7,10,11],
+    tip:'봄 재배는 4월 초 아주심기 후 6~7월 수확. 서늘한 기후에서 잘 결구돼요.',
+    caution:'배추좀나방·진딧물 피해가 잦아요. 방충망을 씌워두면 효과적이에요.',
+    hint:'결구가 단단해지면 바로 수확! 오래 두면 속이 터지거나 맛이 떨어져요.',
+    sowMethod:'모종 구입 후 아주심기. 포기 간격 40~50cm. 뿌리가 상하지 않게 조심히 심어요.' },
+  { name:'브로콜리', emoji:'🥦', cat:'채소', season:['봄','가을'],
+    sow:[4,8], grow:[4,5,8,9,10], harvest:[6,10,11],
+    tip:'봄 4월 초 아주심기 후 6월 수확. 가을은 8월 하순 심어 10~11월 수확해요.',
+    caution:'꽃봉오리가 노랗게 피기 전에 수확하세요. 늦으면 품질이 급격히 떨어져요.',
+    hint:'가운데 큰 꽃봉오리 수확 후 옆가지 작은 꽃봉오리도 계속 수확할 수 있어요.',
+    sowMethod:'모종 구입 후 아주심기. 포기 간격 50cm. 깊게 심으면 줄기가 썩을 수 있어요.' },
+  { name:'대파', emoji:'🌱', svgIcon:'DAEJPA', cat:'채소', season:['봄','가을'],
+    sow:[4,9], grow:[4,5,6,9,10,11], harvest:[6,7,11],
+    tip:'4월 아주심기 후 6~7월 수확, 가을은 9월 심어 11월 수확. 연중 관리가 중요해요.',
+    caution:'과습하면 뿌리가 썩어요. 배수가 잘 되는 곳에 심고 물빠짐을 확인하세요.',
+    hint:'북주기(흙을 모아 덮어주기)를 해주면 하얀 줄기 부분이 길어져 품질이 좋아져요.',
+    sowMethod:'모종 구입 후 아주심기. 깊이 10~15cm 골을 파고 심은 뒤 흙을 덮어요.' },
+  // ── 과일·열매 ─────────────────────────────────────────
+  { name:'토마토', emoji:'🍅', cat:'과일', season:['여름'],
+    sow:[5], grow:[5,6,7,8], harvest:[6,7,8,9],
+    tip:'5월 초 모종 아주심기. 지주대 필수, 곁순 제거로 영양을 집중시켜요.',
+    caution:'물을 갑자기 많이 주면 열매가 갈라져요. 일정하게 수분을 유지하세요.',
+    hint:'곁순(잎 사이에 나는 새순) 제거가 핵심! 2~3줄기로 키워야 열매가 실해요.',
+    sowMethod:'모종 구입 후 아주심기. 포기 간격 50~60cm. 접목 부위가 흙에 묻히지 않도록.' },
+  { name:'부추', emoji:'🌿', cat:'채소', season:['봄','여름','가을'],
+    sow:[4], grow:[4,5,6,7,8,9,10], harvest:[5,6,7,8,9,10],
+    tip:'4월 아주심기 후 60일부터 수확 시작. 한 번 심으면 여러 해 수확하는 다년생이에요.',
+    caution:'심은 첫 해에는 포기가 자리잡을 수 있도록 수확량을 조절하세요.',
+    hint:'수확 후 밑동 3~5cm 남기고 자르면 2~3주 후 다시 수확 가능해요.',
+    sowMethod:'모종 또는 직파. 모종은 5~6포기씩 모아심기, 씨앗은 줄뿌림 후 솎아요.' },
+  { name:'쪽파', emoji:'🌱', cat:'채소', season:['가을'],
+    sow:[8,9], grow:[9,10,11], harvest:[10,11],
+    tip:'8월 하순~9월 초 알뿌리 심기. 재배기간이 짧아 가을 텃밭 입문 작물로 딱이에요.',
+    caution:'알뿌리 심기 전 병해충 예방을 위해 햇볕에 2~3일 말려서 심으세요.',
+    hint:'빽빽하게 심으면 크기가 작아져요. 포기 간격 10cm 이상 확보하세요.',
+    sowMethod:'알뿌리(종구) 심기. 뾰족한 부분이 위로 오게 5~7cm 깊이로 심어요.' },
+  { name:'강낭콩', emoji:'🫘', cat:'과일', season:['봄','가을'],
+    sow:[4,5,8], grow:[4,5,6,8,9], harvest:[6,7,10],
+    tip:'4~5월 직파, 8월 가을 재배도 가능. 배수 좋은 땅을 좋아해요.',
+    caution:'콩과 식물은 연작(같은 자리에 계속 심기)하면 병이 생겨요. 3년 이상 돌려심기 하세요.',
+    hint:'꼬투리가 노르스름해질 때 수확하면 식감이 가장 좋아요.',
+    sowMethod:'직파(씨앗). 3~4cm 깊이, 포기 간격 20~25cm. 한 구멍에 2~3알씩.' },
+  { name:'방울토마토', emoji:'🍅', svgIcon:'CHERRY_TOMATO', cat:'과일', season:['여름'],
+    sow:[5], grow:[5,6,7,8], harvest:[6,7,8,9],
+    tip:'5월 초 모종 아주심기. 토마토보다 열매가 작고 당도가 높아 텃밭에서 인기 최고예요.',
+    caution:'물을 불규칙하게 주면 열매가 갈라져요. 건기엔 꾸준히 물을 주세요.',
+    hint:'한 줄기만 키우는 단간 재배가 관리가 쉬워요. 곁순을 일찍 제거해 주세요.',
+    sowMethod:'모종 구입 후 아주심기. 포기 간격 40~50cm. 지주대를 미리 세운 뒤 심어요.' },
+  // ── 곡류 ──────────────────────────────────────────────
+  { name:'완두콩', emoji:'🫛', cat:'곡류', season:['봄'],
+    sow:[4], grow:[4,5,6], harvest:[6,7],
+    tip:'4월 초 직파 또는 모종 아주심기. 서늘한 봄 날씨를 좋아하며 재배기간이 짧아요.',
+    caution:'고온에 약해요. 장마 전 수확을 마칠 수 있도록 파종 시기를 맞추세요.',
+    hint:'덩굴성이라 지지대나 그물망을 설치해 주세요. 콩꼬투리가 통통해지면 바로 수확하세요.',
+    sowMethod:'직파(씨앗) 또는 모종. 3~4cm 깊이, 포기 간격 15~20cm. 지지대 설치 필수.' },
+  { name:'콩(대두)', emoji:'🫘', cat:'곡류', season:['여름'],
+    sow:[6], grow:[6,7,8,9], harvest:[10],
+    tip:'6월 초·중순 직파. 배수 잘 되는 땅에서 잘 자라요. 콩과 식물이라 토양도 좋아져요.',
+    caution:'콩나방·노린재 피해가 많아요. 꽃 필 때 잘 관찰하세요.',
+    hint:'질소 비료를 줄여도 돼요. 뿌리혹박테리아가 스스로 질소를 고정하거든요.',
+    sowMethod:'직파(씨앗). 4~5cm 깊이, 포기 간격 20~25cm. 한 구멍에 2~3알씩 심어요.' },
+  // ── 뿌리채소 ──────────────────────────────────────────
+  { name:'감자', emoji:'🥔', cat:'뿌리', season:['봄','가을'],
+    sow:[4,8], grow:[4,5,6,8,9,10], harvest:[6,7,10,11],
+    tip:'봄 감자는 4월 초·중순 씨감자 심기, 6~7월 수확. 가을 감자는 8월 하순 심어 10~11월 수확.',
+    caution:'초록빛으로 변한 감자는 솔라닌 독소가 있어 먹으면 안 돼요. 햇빛을 차단하세요.',
+    hint:'꽃봉오리가 올라오면 제거해 주세요. 덩이줄기로 에너지가 집중되어 알이 굵어져요.',
+    sowMethod:'씨감자 심기. 눈이 2~3개 붙도록 잘라 10~15cm 깊이, 30cm 간격으로 심어요.' },
+  { name:'고구마', emoji:'🍠', cat:'뿌리', season:['여름'],
+    sow:[5,6], grow:[6,7,8,9], harvest:[9,10],
+    tip:'5월 하순~6월 초 모종(순) 아주심기. 두둑을 높여 배수를 좋게 해야 해요.',
+    caution:'질소 비료를 많이 주면 잎만 무성하고 고구마가 안 달려요. 비료는 적게!',
+    hint:'서리 오기 전에 반드시 수확하세요. 추위에 노출되면 맛과 저장성이 크게 떨어져요.',
+    sowMethod:'순(모종) 심기. 45~60cm 간격으로 비스듬히 눕혀 심거나 수직으로 꽂아요.' },
+  { name:'무', emoji:'🥬', svgIcon: true, cat:'뿌리', season:['가을'],
+    sow:[8,9], grow:[9,10], harvest:[10,11],
+    tip:'8월 하순~9월 초 직파. 깊게 갈아엎은 땅에서 곧게 자라요. 솎아내기 꼭 해주세요.',
+    caution:'돌이나 뿌리가 있으면 기형으로 자라요. 30cm 이상 깊이 갈아엎고 심으세요.',
+    hint:'솎아낸 어린 무도 버리지 마세요. 잎과 뿌리 모두 먹을 수 있어요.',
+    sowMethod:'직파(씨앗). 2~3cm 깊이, 25~30cm 간격으로 3~4알씩 파종 후 1포기로 솎아요.' },
+  { name:'당근', emoji:'🥕', cat:'뿌리', season:['봄','가을'],
+    sow:[4,5,8], grow:[5,6,7,8,9,10], harvest:[7,8,10,11],
+    tip:'봄 파종은 4월 중순~5월 중순, 수확 7~8월. 가을 파종은 8월, 수확 10~11월.',
+    caution:'이식을 싫어해요. 반드시 제자리에 직파하세요. 씨앗이 작아 얕게 심어야 해요.',
+    hint:'발아 초기엔 흙이 마르지 않도록 충분히 물을 주세요. 싹이 올라오면 솎아가며 키워요.',
+    sowMethod:'직파(씨앗). 1cm 이하로 매우 얕게 뿌리고 흙을 얇게 덮은 뒤 충분히 물을 주세요.' },
+  { name:'갓', emoji:'🌿', svgIcon:'GAT', cat:'채소', season:['가을'],
+    sow:[8,9], grow:[9,10,11], harvest:[10,11],
+    tip:'8월 하순~9월 초 직파. 서늘한 날씨에 잘 자라요. 김장 재료로 쓰이며 매콤한 향이 특징이에요.',
+    caution:'벌레(배추좀나방·진딧물)가 잘 생겨요. 방충망을 씌우거나 주기적으로 살펴보세요.',
+    hint:'솎아낸 어린잎도 먹을 수 있어요. 잎이 커지기 전 수확하면 부드럽고 향이 좋아요.',
+    sowMethod:'직파(씨앗). 5mm 깊이 줄뿌림. 솎아가며 최종 15~20cm 간격으로 키워요.' },
+];
+
+let currentMonth = new Date().getMonth() + 1;
+if (![4,5,6,7,8,9,10,11].includes(currentMonth)) currentMonth = 4;
+let selectedSeason = '전체';
+let selectedCat = '전체';
+
+function getSeasonForMonth(m) {
+  if ([3,4,5].includes(m)) return '봄';
+  if ([6,7,8].includes(m)) return '여름';
+  if ([9,10,11].includes(m)) return '가을';
+  return '겨울';
+}
+
+function buildMonthNav() {
+  const nav = document.getElementById('monthNav');
+  nav.innerHTML = NAV_MONTHS.map(mo => {
+    const m = MONTHS[mo-1];
+    const season = getSeasonForMonth(mo);
+    const colors = { '봄':'#c25f8a','여름':'#3a8c3a','가을':'#c87020','겨울':'#3a6aaa' };
+    return `<button class="month-btn ${mo===currentMonth?'active':''}" 
+      style="${mo===currentMonth?`background:${colors[season]};border-color:${colors[season]};color:white`:''};"
+      onclick="selectMonth(${mo})">${m}</button>`;
+  }).join('');
+}
+
+function buildInfo() {
+  const season = getSeasonForMonth(currentMonth);
+  const seasonEmoji = { '봄':'🌸','여름':'☀️','가을':'🍂','겨울':'❄️' };
+  document.getElementById('currentInfo').innerHTML =
+    `현재 선택: <strong>${currentMonth}월 (${seasonEmoji[season]} ${season})</strong> — 이 시기에 맞는 농작물을 확인하세요`;
+}
+
+function buildSeasonTabs() {
+  document.querySelectorAll('.season-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.season === selectedSeason);
+  });
+}
+
+function getStatusForMonth(crop, month) {
+  if (crop.harvest.includes(month)) return 'harvest';
+  if (crop.grow.includes(month)) return 'grow';
+  if (crop.sow.includes(month)) return 'sow';
+  return null;
+}
+
+// 채소 관리카드 타임라인: 4~11월만 표시
+const BAR_MONTHS = [4,5,6,7,8,9,10,11];
+
+function buildBar(crop) {
+  const colors = { sow:'#80c980', grow:'#4a9c4a', harvest:'#e07830', rest:'#f0f0f0' };
+  const segWidth = (100/BAR_MONTHS.length).toFixed(2) + '%';
+  const segs = BAR_MONTHS.map(m => getStatusForMonth(crop, m));
+  return `<div class="timeline-bar">
+    ${segs.map((s,i) => {
+      const mo = BAR_MONTHS[i];
+      return `<div class="timeline-segment"
+        style="width:${segWidth};background:${colors[s]};${mo===currentMonth?'outline:2px solid #333;z-index:1;':''}"
+        title="${mo}월: ${s==='sow'?'파종':s==='grow'?'재배':s==='harvest'?'수확':'휴식'}"></div>`;
+    }).join('')}
+  </div>
+  <div class="month-labels">
+    ${BAR_MONTHS.map(m=>`<span>${m}</span>`).join('')}
+  </div>`;
+}
+
+function buildVeggieCards() {
+  const grid = document.getElementById('veggieGrid');
+  const catColors = { '채소':'#4a7c3f','과일':'#c83030','곡류':'#c87020','뿌리':'#8a5020' };
+
+  let filtered = crops.filter(c => {
+    const catOk = selectedCat === '전체' || c.cat === selectedCat;
+    const seasonOk = selectedSeason === '전체' || c.season.includes(selectedSeason);
+    return catOk && seasonOk;
+  });
+
+  const status = filtered.map(c => ({ crop: c, status: getStatusForMonth(c, currentMonth) }));
+  status.sort((a,b) => {
+    const order = { harvest:0, sow:1, grow:2, null:3 };
+    return order[a.status] - order[b.status];
+  });
+
+  if (status.length === 0) {
+    grid.innerHTML = '<div class="no-result">해당 조건의 농작물이 없습니다 🌱</div>';
+    return;
+  }
+
+  grid.innerHTML = status.map(({ crop: c, status: st }) => {
+    const isHighlight = st !== null;
+    const stLabel = st === 'sow' ? '🌱 지금 파종 시기' : st === 'grow' ? '🌿 지금 재배 중' : st === 'harvest' ? '🧺 지금 수확 시기' : '';
+    const svgMap = { true: DAIKON_SVG, DAEJPA: DAEJPA_SVG, BAECHU: BAECHU_SVG, CABBAGE: CABBAGE_SVG, SPINACH: SPINACH_SVG, GAT: GAT_SVG, CHERRY_TOMATO: CHERRY_TOMATO_SVG };
+    const emojiHtml = c.svgIcon
+      ? `<span class="crop-emoji" style="display:inline-flex;align-items:center;">${svgMap[c.svgIcon]||''}</span>`
+      : `<span class="crop-emoji">${c.emoji}</span>`;
+    return `<div class="veggie-card ${isHighlight?'highlight':''}">
+      <div class="veggie-card-header">
+        ${emojiHtml}
+        <div>
+          <div class="crop-name">${c.name}</div>
+          <span class="crop-category" style="color:${catColors[c.cat]||'#888'}">${c.cat}</span>
+        </div>
+        ${stLabel ? `<span style="margin-left:auto;font-size:0.75rem;font-weight:600;color:${st==='harvest'?'#e07830':st==='sow'?'#4a9c4a':'#4a7c3f'}">${stLabel}</span>` : ''}
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-label">📅 연간 일정</div>
+        ${buildBar(c)}
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#80c980"></div>파종</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4a9c4a"></div>재배</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e07830"></div>수확</div>
+      </div>
+      <div class="tip-box">💡 ${c.tip}</div>
+      <div class="extra-info">
+        ${c.sowMethod ? `<div class="sow-box">🌱 <strong>파종방법</strong>&nbsp; ${c.sowMethod}</div>` : ''}
+        ${c.caution ? `<div class="caution-box">⚠️ <strong>주의</strong>&nbsp; ${c.caution}</div>` : ''}
+        ${c.hint ? `<div class="hint-box">✅ <strong>꿀팁</strong>&nbsp; ${c.hint}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectMonth(m) {
+  currentMonth = m;
+  render();
+}
+
+function render() {
+  buildMonthNav();
+  buildInfo();
+  buildSeasonTabs();
+  buildVeggieCards();
+}
+
+document.getElementById('seasonTabs').addEventListener('click', e => {
+  const tab = e.target.closest('.season-tab');
+  if (!tab) return;
+  selectedSeason = tab.dataset.season;
+  render();
+});
+
+document.getElementById('filterBar').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  selectedCat = btn.dataset.cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === selectedCat));
+  buildVeggieCards();
+});
+
+render();
+</script>
+</body>
+</html>
