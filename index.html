@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', sans-serif; background: #f5f0e8; color: #3a2e1e; min-height: 100vh; }
-
+ 
   header {
     background: linear-gradient(135deg, #4a7c3f, #6aab5e);
     color: white;
@@ -17,9 +17,9 @@
   }
   header h1 { font-size: 1.8rem; font-weight: 700; }
   header p { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
-
+ 
   .weather-loading { font-size: 0.85rem; color: #888; padding: 14px; text-align: center; }
-
+ 
   .weather-section {
     background: #eaf3f8;
     border-bottom: 1px solid #c8dcea;
@@ -46,7 +46,7 @@
   .weather-card .w-desc { font-size: 0.78rem; color: #666; }
   .weather-card .w-temp { font-size: 0.88rem; font-weight: 600; color: #333; }
   .weather-card .w-temp span { font-weight: 400; color: #999; }
-
+ 
   .month-nav {
     display: flex;
     justify-content: center;
@@ -70,7 +70,7 @@
   }
   .month-btn:hover { background: #e8f5e2; }
   .month-btn.active { background: #4a7c3f; color: white; border-color: #4a7c3f; }
-
+ 
   .season-tabs {
     display: flex;
     justify-content: center;
@@ -95,7 +95,7 @@
   .season-tab[data-season="가을"].active { background: #c87020; color: white; }
   .season-tab[data-season="겨울"] { background: #eef3fa; color: #3a6aaa; border-color: #a8c0e8; }
   .season-tab[data-season="겨울"].active { background: #3a6aaa; color: white; }
-
+ 
   .current-info {
     text-align: center;
     padding: 10px;
@@ -103,7 +103,7 @@
     color: #666;
   }
   .current-info strong { color: #4a7c3f; font-size: 1.1rem; }
-
+ 
   .filter-bar {
     display: flex;
     justify-content: center;
@@ -122,7 +122,7 @@
     transition: all 0.2s;
   }
   .filter-btn.active { background: #4a7c3f; color: white; border-color: #4a7c3f; }
-
+ 
   .veggie-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -131,7 +131,7 @@
     max-width: 1100px;
     margin: 0 auto;
   }
-
+ 
   .veggie-card {
     background: white;
     border-radius: 14px;
@@ -142,12 +142,12 @@
   }
   .veggie-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
   .veggie-card.highlight { border-left-color: #f5a623; background: #fffbf0; }
-
+ 
   .veggie-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .crop-emoji { font-size: 2rem; }
   .crop-name { font-size: 1.05rem; font-weight: 700; }
   .crop-category { font-size: 0.75rem; color: #888; background: #f0f0f0; padding: 2px 8px; border-radius: 10px; }
-
+ 
   .timeline-row { margin: 6px 0; }
   .timeline-label { font-size: 0.75rem; color: #888; margin-bottom: 3px; }
   .timeline-bar {
@@ -158,7 +158,7 @@
     background: #f0f0f0;
   }
   .timeline-segment { height: 100%; transition: opacity 0.2s; }
-
+ 
   .legend {
     display: flex;
     gap: 12px;
@@ -167,7 +167,7 @@
   }
   .legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.72rem; color: #666; }
   .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
-
+ 
   .tip-box {
     background: #fffbf0;
     border: 1px solid #f0d080;
@@ -207,7 +207,7 @@
     font-size: 0.78rem;
     color: #5a2a8a;
   }
-
+ 
   .month-labels {
     display: flex;
     justify-content: space-between;
@@ -216,7 +216,7 @@
     padding: 0 2px;
     margin-top: 2px;
   }
-
+ 
   .no-result {
     text-align: center;
     padding: 40px;
@@ -224,7 +224,7 @@
     font-size: 1rem;
     grid-column: 1/-1;
   }
-
+ 
   footer {
     text-align: center;
     padding: 20px;
@@ -235,18 +235,51 @@
 </style>
 </head>
 <body>
-
+ 
 <header>
   <h1>🌾 시흥시 시민행복텃밭 농작물 캘린더</h1>
   <p>경기도 시흥시 기준 · 파종부터 수확까지 한눈에</p>
-  <p style="margin-top:8px;font-size:0.82rem;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:20px;display:inline-block;padding:5px 16px;opacity:0.92;">📅 시민행복텃밭 운영기간(4월~11월) 기준으로 표시됩니다</p>
+  <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:14px;">
+ 
+    <!-- 토돌이: 흰 원 + 파란 모자 -->
+    <svg width="58" height="66" viewBox="0 0 110 125" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="36" rx="30" ry="7" fill="#60b0e0"/>
+      <ellipse cx="55" cy="29" rx="20" ry="14" fill="#70c0f0"/>
+      <circle cx="55" cy="72" r="40" fill="#f5f5f5"/>
+      <circle cx="55" cy="72" r="40" fill="none" stroke="#e0e0e8" stroke-width="1.5"/>
+      <ellipse cx="43" cy="70" rx="5" ry="6" fill="#333"/>
+      <ellipse cx="67" cy="70" rx="5" ry="6" fill="#333"/>
+      <ellipse cx="41.5" cy="68" rx="2" ry="2" fill="#fff" opacity="0.8"/>
+      <ellipse cx="65.5" cy="68" rx="2" ry="2" fill="#fff" opacity="0.8"/>
+      <ellipse cx="31" cy="80" rx="8" ry="5" fill="#f0a0a0" opacity="0.5"/>
+      <ellipse cx="79" cy="80" rx="8" ry="5" fill="#f0a0a0" opacity="0.5"/>
+      <path d="M42,84 Q55,96 68,84" stroke="#555" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>
+ 
+    <!-- 해돌이: 노란 원 + 초록 모자 -->
+    <svg width="66" height="74" viewBox="0 0 110 125" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="55" cy="34" rx="30" ry="7" fill="#4a8a20"/>
+      <ellipse cx="55" cy="27" rx="20" ry="14" fill="#5aaa28"/>
+      <ellipse cx="62" cy="20" rx="8" ry="6" fill="#7acc40"/>
+      <circle cx="55" cy="72" r="40" fill="#f5c830"/>
+      <ellipse cx="43" cy="70" rx="5" ry="6" fill="#333"/>
+      <ellipse cx="67" cy="70" rx="5" ry="6" fill="#333"/>
+      <ellipse cx="41.5" cy="68" rx="2" ry="2" fill="#fff" opacity="0.8"/>
+      <ellipse cx="65.5" cy="68" rx="2" ry="2" fill="#fff" opacity="0.8"/>
+      <ellipse cx="31" cy="80" rx="8" ry="5" fill="#e08030" opacity="0.4"/>
+      <ellipse cx="79" cy="80" rx="8" ry="5" fill="#e08030" opacity="0.4"/>
+      <path d="M42,84 Q55,96 68,84" stroke="#555" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>
+ 
+  </div>
+  <p style="margin-top:10px;font-size:0.82rem;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:20px;display:inline-block;padding:5px 16px;opacity:0.92;">📅 시민행복텃밭 운영기간(4월~11월) 기준으로 표시됩니다</p>
 </header>
-
+ 
 <div id="weatherBar"><div class="weather-loading">🌤 날씨 불러오는 중...</div></div>
-
+ 
 <div class="month-nav" id="monthNav"></div>
 <div class="current-info" id="currentInfo"></div>
-
+ 
 <div class="season-tabs" id="seasonTabs">
   <div class="season-tab" data-season="전체">🌍 전체</div>
   <div class="season-tab" data-season="봄">🌸 봄</div>
@@ -254,7 +287,7 @@
   <div class="season-tab" data-season="가을">🍂 가을</div>
   <div class="season-tab" data-season="겨울">❄️ 겨울</div>
 </div>
-
+ 
 <div class="filter-bar" id="filterBar">
   <button class="filter-btn active" data-cat="전체">전체</button>
   <button class="filter-btn" data-cat="채소">🥬 채소</button>
@@ -262,11 +295,11 @@
   <button class="filter-btn" data-cat="곡류">🌾 곡류</button>
   <button class="filter-btn" data-cat="뿌리">🥕 뿌리채소</button>
 </div>
-
+ 
 <div class="veggie-grid" id="veggieGrid"></div>
-
+ 
 <footer>📍 경기도 시흥시(중부지방) 기준 · 국립원예특작과학원 텃밭 캘린더 참고 · 기후에 따라 시기가 다소 달라질 수 있습니다</footer>
-
+ 
 <script>
 // ── 날씨 (Open-Meteo, 시흥시 좌표) ──────────────────────────────
 const WMO = {
@@ -287,7 +320,7 @@ const WMO_ICON = {
   80:'🌦', 81:'🌧', 82:'⛈',
   95:'⛈', 96:'⛈', 99:'⛈'
 };
-
+ 
 async function loadWeather() {
   try {
     const url = 'https://api.open-meteo.com/v1/forecast' +
@@ -327,10 +360,10 @@ async function loadWeather() {
 }
 loadWeather();
 // ────────────────────────────────────────────────────────────────
-
+ 
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 const NAV_MONTHS = [4,5,6,7,8,9,10,11];
-
+ 
 const DAEJPA_SVG = `<svg width="52" height="52" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
 <path d="M242,30 Q238,80 236,130 Q234,180 236,230 Q238,260 242,280" stroke="#3a9030" stroke-width="16" fill="none" stroke-linecap="round"/>
 <path d="M252,28 Q248,78 246,128 Q244,178 246,228 Q248,258 252,278" stroke="#52b040" stroke-width="10" fill="none" stroke-linecap="round"/>
@@ -385,7 +418,7 @@ const DAEJPA_SVG = `<svg width="52" height="52" viewBox="0 0 680 520" xmlns="htt
 <path d="M318,266 Q320,259 332,257 Q346,255 348,262 Q346,272 332,274 Q318,276 318,266Z" fill="#c8e8a0" opacity="0.7"/>
 <path d="M408,272 Q410,265 422,263 Q436,261 438,268 Q436,278 422,280 Q408,282 408,272Z" fill="#c8e8a0" opacity="0.7"/>
 </svg>`;
-
+ 
 const BAECHU_SVG = `<svg width="52" height="52" viewBox="0 0 680 700" xmlns="http://www.w3.org/2000/svg">
 <defs><clipPath id="bc"><ellipse cx="340" cy="390" rx="210" ry="280"/></clipPath></defs>
 <path d="M340,60 Q390,50 430,65 Q468,80 488,108 Q510,95 535,108 Q558,125 555,152 Q578,162 590,188 Q596,215 582,235 Q600,255 598,285 Q594,310 578,325 Q590,350 582,375 Q570,398 550,408 Q548,435 530,452 Q508,465 485,462 Q468,482 445,492 Q412,502 380,500 Q362,510 340,512 Q318,510 300,500 Q268,502 245,492 Q222,482 205,462 Q182,465 160,452 Q140,435 138,408 Q118,398 106,375 Q98,350 110,325 Q94,310 90,285 Q88,255 106,235 Q92,215 98,188 Q110,162 133,152 Q130,125 153,108 Q178,95 200,108 Q220,80 258,65 Q290,50 340,60Z" fill="#5cb832"/>
@@ -412,7 +445,7 @@ const BAECHU_SVG = `<svg width="52" height="52" viewBox="0 0 680 700" xmlns="htt
 <ellipse cx="340" cy="500" rx="80" ry="20" fill="#ddf0b8"/>
 <ellipse cx="340" cy="500" rx="60" ry="14" fill="#eef8d0"/>
 </svg>`;
-
+ 
 const CABBAGE_SVG = `<svg width="52" height="52" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg">
 <path d="M196,318 Q168,330 148,348 Q132,364 128,382 Q126,396 136,402 Q146,406 158,398 Q172,386 188,370 Q204,354 216,340" stroke="#2a3a18" stroke-width="10" fill="none" stroke-linecap="round"/>
 <path d="M484,318 Q512,330 532,348 Q548,364 552,382 Q554,396 544,402 Q534,406 522,398 Q508,386 492,370 Q476,354 464,340" stroke="#2a3a18" stroke-width="10" fill="none" stroke-linecap="round"/>
@@ -450,7 +483,7 @@ const CABBAGE_SVG = `<svg width="52" height="52" viewBox="0 0 680 620" xmlns="ht
 <path d="M354,80 Q360,56 368,40 Q356,52 344,46 Q340,58 340,74" fill="#4e8e1a"/>
 <path d="M340,82 Q334,60 332,44 Q340,54 348,44 Q346,60 340,82" fill="#66aa28"/>
 </svg>`;
-
+ 
 const SPINACH_SVG = `<svg width="52" height="52" viewBox="0 0 680 640" xmlns="http://www.w3.org/2000/svg">
 <path d="M340,580 Q334,540 330,500 Q326,465 328,435" stroke="#c8703a" stroke-width="14" fill="none" stroke-linecap="round"/>
 <path d="M340,580 Q346,540 350,500 Q354,465 352,435" stroke="#d4845a" stroke-width="8" fill="none" stroke-linecap="round"/>
@@ -475,7 +508,7 @@ const SPINACH_SVG = `<svg width="52" height="52" viewBox="0 0 680 640" xmlns="ht
 <path d="M314,250 Q322,295 328,340 Q332,368 336,390" stroke="#1a5210" stroke-width="1.2" fill="none" opacity="0.45"/>
 <path d="M366,250 Q358,295 352,340 Q348,368 344,390" stroke="#1a5210" stroke-width="1.2" fill="none" opacity="0.45"/>
 </svg>`;
-
+ 
 const GAT_SVG = `<svg width="52" height="52" viewBox="0 0 680 600" xmlns="http://www.w3.org/2000/svg">
 <path d="M295,580 Q292,530 290,480 Q288,440 290,405" stroke="#c8d870" stroke-width="12" fill="none" stroke-linecap="round"/>
 <path d="M295,580 Q298,530 300,480 Q302,445 300,408" stroke="#dae890" stroke-width="6" fill="none" stroke-linecap="round"/>
@@ -506,7 +539,7 @@ const GAT_SVG = `<svg width="52" height="52" viewBox="0 0 680 600" xmlns="http:/
 <path d="M312,192 Q320,240 326,290 Q330,322 334,352" stroke="#2a7018" stroke-width="1.3" fill="none" opacity="0.48"/>
 <path d="M368,192 Q360,240 354,290 Q350,322 346,352" stroke="#2a7018" stroke-width="1.3" fill="none" opacity="0.48"/>
 </svg>`;
-
+ 
 const CHERRY_TOMATO_SVG = `<svg width="52" height="52" viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg">
 <path d="M340,80 Q338,120 336,160 Q334,200 332,235" stroke="#5a8a28" stroke-width="6" fill="none" stroke-linecap="round"/>
 <path d="M334,185 Q305,195 282,210 Q262,224 252,242" stroke="#5a8a28" stroke-width="5" fill="none" stroke-linecap="round"/>
@@ -551,7 +584,7 @@ const CHERRY_TOMATO_SVG = `<svg width="52" height="52" viewBox="0 0 680 580" xml
 <path d="M340,78 Q338,56 338,40 Q340,58 340,74" fill="#5a9830"/>
 <path d="M350,80 Q358,60 364,45 Q354,58 348,72" fill="#4a8020"/>
 </svg>`;
-
+ 
 const DAIKON_SVG = `<svg width="52" height="52" viewBox="0 0 680 660" xmlns="http://www.w3.org/2000/svg">
 <defs>
   <radialGradient id="dBG" cx="38%" cy="35%" r="62%"><stop offset="0%" stop-color="#f8faf0"/><stop offset="40%" stop-color="#eef3db"/><stop offset="100%" stop-color="#d0d8a8"/></radialGradient>
@@ -602,7 +635,7 @@ const DAIKON_SVG = `<svg width="52" height="52" viewBox="0 0 680 660" xmlns="htt
 <path d="M426,526 Q438,538 441,550" stroke="#b89e60" stroke-width="1" fill="none" stroke-linecap="round"/>
 <path d="M385,556 Q395,568 396,580" stroke="#b89e60" stroke-width="1" fill="none" stroke-linecap="round"/>
 </svg>`;
-
+ 
 // ── 작물 데이터: 국립원예특작과학원 텃밭 캘린더 기준 (중부지방 실외 노지) ──
 // sow: 파종/아주심기, grow: 재배, harvest: 수확
 const crops = [
@@ -737,19 +770,19 @@ const crops = [
     hint:'솎아낸 어린잎도 먹을 수 있어요. 잎이 커지기 전 수확하면 부드럽고 향이 좋아요.',
     sowMethod:'직파(씨앗). 5mm 깊이 줄뿌림. 솎아가며 최종 15~20cm 간격으로 키워요.' },
 ];
-
+ 
 let currentMonth = new Date().getMonth() + 1;
 if (![4,5,6,7,8,9,10,11].includes(currentMonth)) currentMonth = 4;
 let selectedSeason = '전체';
 let selectedCat = '전체';
-
+ 
 function getSeasonForMonth(m) {
   if ([3,4,5].includes(m)) return '봄';
   if ([6,7,8].includes(m)) return '여름';
   if ([9,10,11].includes(m)) return '가을';
   return '겨울';
 }
-
+ 
 function buildMonthNav() {
   const nav = document.getElementById('monthNav');
   nav.innerHTML = NAV_MONTHS.map(mo => {
@@ -761,30 +794,30 @@ function buildMonthNav() {
       onclick="selectMonth(${mo})">${m}</button>`;
   }).join('');
 }
-
+ 
 function buildInfo() {
   const season = getSeasonForMonth(currentMonth);
   const seasonEmoji = { '봄':'🌸','여름':'☀️','가을':'🍂','겨울':'❄️' };
   document.getElementById('currentInfo').innerHTML =
     `현재 선택: <strong>${currentMonth}월 (${seasonEmoji[season]} ${season})</strong> — 이 시기에 맞는 농작물을 확인하세요`;
 }
-
+ 
 function buildSeasonTabs() {
   document.querySelectorAll('.season-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.season === selectedSeason);
   });
 }
-
+ 
 function getStatusForMonth(crop, month) {
   if (crop.harvest.includes(month)) return 'harvest';
   if (crop.grow.includes(month)) return 'grow';
   if (crop.sow.includes(month)) return 'sow';
   return null;
 }
-
+ 
 // 채소 관리카드 타임라인: 4~11월만 표시
 const BAR_MONTHS = [4,5,6,7,8,9,10,11];
-
+ 
 function buildBar(crop) {
   const colors = { sow:'#80c980', grow:'#4a9c4a', harvest:'#e07830', rest:'#f0f0f0' };
   const segWidth = (100/BAR_MONTHS.length).toFixed(2) + '%';
@@ -801,28 +834,28 @@ function buildBar(crop) {
     ${BAR_MONTHS.map(m=>`<span>${m}</span>`).join('')}
   </div>`;
 }
-
+ 
 function buildVeggieCards() {
   const grid = document.getElementById('veggieGrid');
   const catColors = { '채소':'#4a7c3f','과일':'#c83030','곡류':'#c87020','뿌리':'#8a5020' };
-
+ 
   let filtered = crops.filter(c => {
     const catOk = selectedCat === '전체' || c.cat === selectedCat;
     const seasonOk = selectedSeason === '전체' || c.season.includes(selectedSeason);
     return catOk && seasonOk;
   });
-
+ 
   const status = filtered.map(c => ({ crop: c, status: getStatusForMonth(c, currentMonth) }));
   status.sort((a,b) => {
     const order = { harvest:0, sow:1, grow:2, null:3 };
     return order[a.status] - order[b.status];
   });
-
+ 
   if (status.length === 0) {
     grid.innerHTML = '<div class="no-result">해당 조건의 농작물이 없습니다 🌱</div>';
     return;
   }
-
+ 
   grid.innerHTML = status.map(({ crop: c, status: st }) => {
     const isHighlight = st !== null;
     const stLabel = st === 'sow' ? '🌱 지금 파종 시기' : st === 'grow' ? '🌿 지금 재배 중' : st === 'harvest' ? '🧺 지금 수확 시기' : '';
@@ -837,7 +870,93 @@ function buildVeggieCards() {
           <div class="crop-name">${c.name}</div>
           <span class="crop-category" style="color:${catColors[c.cat]||'#888'}">${c.cat}</span>
         </div>
-        ${stLabel ? `<span style="margin-left:auto;font-size:0.75rem;font-weight:600;color:${st==='harvest'?'#e07830':st==='sow'?'#4a9c4a':'#4a7c3f'}">${stLabel}</span>` : ''}
+        ${st === 'sow' ? `<span style="margin-left:auto;display:flex;flex-direction:column;align-items:center;gap:2px;"><svg width="52" height="52" viewBox="0 0 130 120" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+  <!-- 땅 -->
+  <ellipse cx="65" cy="108" rx="52" ry="8" fill="#c8a060" opacity="0.4"/>
+  <!-- 씨앗들 -->
+  <ellipse cx="38" cy="106" rx="4" ry="3" fill="#8B6340" opacity="0.7"/>
+  <ellipse cx="52" cy="107" rx="3" ry="2.5" fill="#8B6340" opacity="0.6"/>
+  <ellipse cx="28" cy="105" rx="3" ry="2" fill="#8B6340" opacity="0.5"/>
+  <!-- 삽 -->
+  <rect x="88" y="52" width="5" height="42" rx="2" fill="#a0784a"/>
+  <path d="M82,86 Q88,96 94,86 L91,78 L85,78 Z" fill="#888"/>
+  <path d="M84,79 Q88,84 92,79" fill="#aaa"/>
+  <!-- 토돌이 얼굴 -->
+  <ellipse cx="56" cy="28" rx="28" ry="7" fill="#60b0e0"/>
+  <ellipse cx="56" cy="22" rx="19" ry="13" fill="#70c0f0"/>
+  <circle cx="56" cy="65" r="37" fill="#f5f5f5"/>
+  <circle cx="56" cy="65" r="37" fill="none" stroke="#e0e0e8" stroke-width="1.5"/>
+  <ellipse cx="45" cy="63" rx="4.5" ry="5.5" fill="#333"/>
+  <ellipse cx="67" cy="63" rx="4.5" ry="5.5" fill="#333"/>
+  <ellipse cx="43.5" cy="61" rx="1.8" ry="1.8" fill="#fff" opacity="0.8"/>
+  <ellipse cx="65.5" cy="61" rx="1.8" ry="1.8" fill="#fff" opacity="0.8"/>
+  <ellipse cx="32" cy="73" rx="7" ry="4" fill="#f0a0a0" opacity="0.5"/>
+  <ellipse cx="80" cy="73" rx="7" ry="4" fill="#f0a0a0" opacity="0.5"/>
+  <!-- 집중하는 표정 (살짝 웃음) -->
+  <path d="M44,77 Q56,86 68,77" stroke="#555" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- 팔 (삽 잡는) -->
+  <path d="M80,72 Q86,68 90,62" stroke="#e0e8f0" stroke-width="9" fill="none" stroke-linecap="round"/>
+</svg><span style="font-size:0.68rem;font-weight:600;color:#4a9c4a">${stLabel}</span></span>` : ''}
+        ${st === 'grow' ? `<span style="margin-left:auto;display:flex;flex-direction:column;align-items:center;gap:2px;"><svg width="52" height="52" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+  <!-- 물방울들 -->
+  <ellipse cx="108" cy="68" rx="2.5" ry="3.5" fill="#60b8f0" opacity="0.8"/>
+  <ellipse cx="115" cy="74" rx="2" ry="3" fill="#60b8f0" opacity="0.7"/>
+  <ellipse cx="104" cy="78" rx="2" ry="3" fill="#60b8f0" opacity="0.6"/>
+  <ellipse cx="119" cy="82" rx="2" ry="3" fill="#60b8f0" opacity="0.6"/>
+  <ellipse cx="110" cy="88" rx="2" ry="3" fill="#60b8f0" opacity="0.5"/>
+  <!-- 물뿌리개 -->
+  <path d="M88,58 Q98,54 106,56 Q112,58 110,64 Q108,70 100,70 Q90,70 86,64 Z" fill="#88b8d8"/>
+  <rect x="100" y="52" width="18" height="7" rx="3" fill="#70a8c8"/>
+  <path d="M108,52 Q112,44 116,42" stroke="#70a8c8" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- 해돌이 얼굴 -->
+  <ellipse cx="52" cy="26" rx="28" ry="7" fill="#4a8a20"/>
+  <ellipse cx="52" cy="20" rx="19" ry="13" fill="#5aaa28"/>
+  <ellipse cx="58" cy="14" rx="7" ry="5" fill="#7acc40"/>
+  <circle cx="52" cy="62" r="37" fill="#f5c830"/>
+  <ellipse cx="41" cy="60" rx="4.5" ry="5.5" fill="#333"/>
+  <ellipse cx="63" cy="60" rx="4.5" ry="5.5" fill="#333"/>
+  <ellipse cx="39.5" cy="58" rx="1.8" ry="1.8" fill="#fff" opacity="0.8"/>
+  <ellipse cx="61.5" cy="58" rx="1.8" ry="1.8" fill="#fff" opacity="0.8"/>
+  <ellipse cx="28" cy="70" rx="7" ry="4" fill="#e08030" opacity="0.4"/>
+  <ellipse cx="76" cy="70" rx="7" ry="4" fill="#e08030" opacity="0.4"/>
+  <!-- 즐거운 표정 -->
+  <path d="M40,74 Q52,86 64,74" stroke="#555" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- 팔 (물뿌리개 잡는) -->
+  <path d="M76,68 Q82,62 88,60" stroke="#f0d050" stroke-width="9" fill="none" stroke-linecap="round"/>
+</svg><span style="font-size:0.68rem;font-weight:600;color:#4a7c3f">${stLabel}</span></span>` : ''}
+        ${st === 'harvest' ? `<span style="margin-left:auto;display:flex;flex-direction:column;align-items:center;gap:2px;"><svg width="72" height="52" viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+  <!-- 토돌이 -->
+  <ellipse cx="44" cy="22" rx="22" ry="5.5" fill="#60b0e0"/>
+  <ellipse cx="44" cy="17" rx="15" ry="10" fill="#70c0f0"/>
+  <circle cx="44" cy="52" r="29" fill="#f5f5f5"/>
+  <circle cx="44" cy="52" r="29" fill="none" stroke="#e0e0e8" stroke-width="1.2"/>
+  <ellipse cx="35" cy="50" rx="3.8" ry="4.5" fill="#333"/>
+  <ellipse cx="53" cy="50" rx="3.8" ry="4.5" fill="#333"/>
+  <ellipse cx="33.8" cy="48.5" rx="1.5" ry="1.5" fill="#fff" opacity="0.8"/>
+  <ellipse cx="51.8" cy="48.5" rx="1.5" ry="1.5" fill="#fff" opacity="0.8"/>
+  <ellipse cx="24" cy="59" rx="6" ry="3.5" fill="#f0a0a0" opacity="0.5"/>
+  <ellipse cx="64" cy="59" rx="6" ry="3.5" fill="#f0a0a0" opacity="0.5"/>
+  <path d="M33,63 Q44,74 55,63" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- 토돌이 팔 (만세) -->
+  <path d="M18,50 Q10,38 8,28" stroke="#e0e8f8" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <!-- 해돌이 -->
+  <ellipse cx="136" cy="22" rx="22" ry="5.5" fill="#4a8a20"/>
+  <ellipse cx="136" cy="17" rx="15" ry="10" fill="#5aaa28"/>
+  <ellipse cx="140" cy="12" rx="6" ry="4" fill="#7acc40"/>
+  <circle cx="136" cy="52" r="29" fill="#f5c830"/>
+  <ellipse cx="127" cy="50" rx="3.8" ry="4.5" fill="#333"/>
+  <ellipse cx="145" cy="50" rx="3.8" ry="4.5" fill="#333"/>
+  <ellipse cx="125.8" cy="48.5" rx="1.5" ry="1.5" fill="#fff" opacity="0.8"/>
+  <ellipse cx="143.8" cy="48.5" rx="1.5" ry="1.5" fill="#fff" opacity="0.8"/>
+  <ellipse cx="116" cy="59" rx="6" ry="3.5" fill="#e08030" opacity="0.4"/>
+  <ellipse cx="156" cy="59" rx="6" ry="3.5" fill="#e08030" opacity="0.4"/>
+  <path d="M125,63 Q136,74 147,63" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- 해돌이 팔 (만세) -->
+  <path d="M160,50 Q168,38 172,28" stroke="#f5d040" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <!-- 가운데 하트/별 -->
+  <text x="90" y="58" font-size="18" text-anchor="middle">🌾</text>
+</svg><span style="font-size:0.68rem;font-weight:600;color:#e07830">${stLabel}</span></span>` : ''}
+        ${!st ? '' : ''}
       </div>
       <div class="timeline-row">
         <div class="timeline-label">📅 연간 일정</div>
@@ -857,26 +976,26 @@ function buildVeggieCards() {
     </div>`;
   }).join('');
 }
-
+ 
 function selectMonth(m) {
   currentMonth = m;
   render();
 }
-
+ 
 function render() {
   buildMonthNav();
   buildInfo();
   buildSeasonTabs();
   buildVeggieCards();
 }
-
+ 
 document.getElementById('seasonTabs').addEventListener('click', e => {
   const tab = e.target.closest('.season-tab');
   if (!tab) return;
   selectedSeason = tab.dataset.season;
   render();
 });
-
+ 
 document.getElementById('filterBar').addEventListener('click', e => {
   const btn = e.target.closest('.filter-btn');
   if (!btn) return;
@@ -884,7 +1003,7 @@ document.getElementById('filterBar').addEventListener('click', e => {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === selectedCat));
   buildVeggieCards();
 });
-
+ 
 render();
 </script>
 </body>
